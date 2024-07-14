@@ -1,76 +1,44 @@
 package org.example.entities;
+
 import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "SubscriptionPlan")
-public class SubscriptionPlanEntity {
-
-    private Long id;
-    private String planName;
-    private double price;
-    private String description;
-    private int maxBookings;
-    private String additionalServices;
+@Table(name = "subscription_plans")
+public class SubscriptionPlanEntity extends BaseEntity {
+    private String name;
+    private Double price;
     private List<ResidentEntity> residents;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
-    public Long getId() {
-        return id;
+    public SubscriptionPlanEntity(String name, Double price, List<ResidentEntity> residents) {
+        this.name = name;
+        this.price = price;
+        this.residents = residents;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public SubscriptionPlanEntity() {
+
     }
 
-    @Column(name = "Plan_Name", nullable = false)
-    public String getPlanName() {
-        return planName;
+    @Column(name = "name")
+    public String getName() {
+        return name;
     }
 
-    public void setPlanName(String planName) {
-        this.planName = planName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    @Column(name = "Price", nullable = false)
-    public double getPrice() {
+    @Column(name = "price")
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
-    @Column(name = "Description", nullable = false)
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    @Column(name = "Max_Bookings", nullable = false)
-    public int getMaxBookings() {
-        return maxBookings;
-    }
-
-    public void setMaxBookings(int maxBookings) {
-        this.maxBookings = maxBookings;
-    }
-
-    @Column(name = "Additional_Services")
-    public String getAdditionalServices() {
-        return additionalServices;
-    }
-
-    public void setAdditionalServices(String additionalServices) {
-        this.additionalServices = additionalServices;
-    }
-
-    @OneToMany(mappedBy = "subscriptionPlan")
+    @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "subscriptionPlan")
     public List<ResidentEntity> getResidents() {
         return residents;
     }

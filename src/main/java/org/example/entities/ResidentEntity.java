@@ -1,50 +1,34 @@
 package org.example.entities;
+
 import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "Resident")
-public class ResidentEntity {
-
-    private Long id;
-    private String firstName;
-    private String lastName;
+@Table(name = "residents")
+public class ResidentEntity extends BaseEntity {
+    private String name;
     private String email;
-    private String contactNumber;
-    private String company;
-    private String subscriptionPlan;
     private List<BookingEntity> bookings;
+    private SubscriptionPlanEntity subscriptionPlan;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
-    public Long getId() {
-        return id;
+    public ResidentEntity() {}
+
+    public ResidentEntity(String name, String email, SubscriptionPlanEntity subscriptionPlan) {
+        this.name = name;
+        this.email = email;
+        this.subscriptionPlan = subscriptionPlan;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    @Column(name = "name")
+    public String getName() {
+        return name;
     }
 
-    @Column(name = "First_Name", nullable = false)
-    public String getFirstName() {
-        return firstName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    @Column(name = "Last_Name", nullable = false)
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    @Column(name = "Email_Address", nullable = false)
+    @Column(name = "email")
     public String getEmail() {
         return email;
     }
@@ -53,39 +37,22 @@ public class ResidentEntity {
         this.email = email;
     }
 
-    @Column(name = "Contact_Number", nullable = false)
-    public String getContactNumber() {
-        return contactNumber;
-    }
-
-    public void setContactNumber(String contactNumber) {
-        this.contactNumber = contactNumber;
-    }
-
-    @Column(name = "Company")
-    public String getCompany() {
-        return company;
-    }
-
-    public void setCompany(String company) {
-        this.company = company;
-    }
-
-    @Column(name = "Subscription_Plan", nullable = false)
-    public String getSubscriptionPlan() {
-        return subscriptionPlan;
-    }
-
-    public void setSubscriptionPlan(String subscriptionPlan) {
-        this.subscriptionPlan = subscriptionPlan;
-    }
-
-    @OneToMany(mappedBy = "resident")
+    @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY,mappedBy = "resident")
     public List<BookingEntity> getBookings() {
         return bookings;
     }
 
     public void setBookings(List<BookingEntity> bookings) {
         this.bookings = bookings;
+    }
+
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @JoinColumn(name = "subscription_plan_id")
+    public SubscriptionPlanEntity getSubscriptionPlan() {
+        return subscriptionPlan;
+    }
+
+    public void setSubscriptionPlan(SubscriptionPlanEntity subscriptionPlan) {
+        this.subscriptionPlan = subscriptionPlan;
     }
 }

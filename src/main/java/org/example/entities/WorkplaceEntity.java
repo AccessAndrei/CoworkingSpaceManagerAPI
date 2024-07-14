@@ -1,76 +1,33 @@
 package org.example.entities;
+
 import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "Workplace")
-public class WorkplaceEntity {
-
-    private Long id;
-    private String workplaceNumber;
-    private String type;
-    private String location;
-    private String availableEquipment;
-    private String status;
+@Table(name = "workplaces")
+public class WorkplaceEntity extends BaseEntity {
+    private String name;
     private List<BookingEntity> bookings;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
-    public Long getId() {
-        return id;
+    public WorkplaceEntity(String name, List<BookingEntity> bookings) {
+        this.name = name;
+        this.bookings = bookings;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public WorkplaceEntity() {
+
     }
 
-    @Column(name = "Workplace_Number", nullable = false)
-    public String getWorkplaceNumber() {
-        return workplaceNumber;
+    @Column(name = "name")
+    public String getName() {
+        return name;
     }
 
-    public void setWorkplaceNumber(String workplaceNumber) {
-        this.workplaceNumber = workplaceNumber;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    @Column(name = "Type", nullable = false)
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    @Column(name = "Location", nullable = false)
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    @Column(name = "Available_Equipment")
-    public String getAvailableEquipment() {
-        return availableEquipment;
-    }
-
-    public void setAvailableEquipment(String availableEquipment) {
-        this.availableEquipment = availableEquipment;
-    }
-
-    @Column(name = "Status", nullable = false)
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    @OneToMany(mappedBy = "workplace")
+    @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY,mappedBy = "workplace")
     public List<BookingEntity> getBookings() {
         return bookings;
     }

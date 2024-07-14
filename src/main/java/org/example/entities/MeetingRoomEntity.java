@@ -1,71 +1,45 @@
 package org.example.entities;
+
 import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "MeetingRoom")
-public class MeetingRoomEntity {
-
-    private Long id;
-    private String roomNumber;
-    private int capacity;
-    private String availableEquipment;
-    private String status;
+@Table(name = "meeting_rooms")
+public class MeetingRoomEntity extends BaseEntity {
+    private String name;
     private List<BookingEntity> bookings;
+    private List<EquipmentEntity> equipment;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
-    public Long getId() {
-        return id;
+    public MeetingRoomEntity() {}
+
+    public MeetingRoomEntity(String name) {
+        this.name = name;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    @Column(name = "name")
+    public String getName() {
+        return name;
     }
 
-    @Column(name = "Room_Number", nullable = false)
-    public String getRoomNumber() {
-        return roomNumber;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setRoomNumber(String roomNumber) {
-        this.roomNumber = roomNumber;
-    }
-
-    @Column(name = "Capacity", nullable = false)
-    public int getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
-    }
-
-    @Column(name = "Available_Equipment")
-    public String getAvailableEquipment() {
-        return availableEquipment;
-    }
-
-    public void setAvailableEquipment(String availableEquipment) {
-        this.availableEquipment = availableEquipment;
-    }
-
-    @Column(name = "Status", nullable = false)
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    @OneToMany(mappedBy = "meetingRoom")
+    @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "meetingRoom")
     public List<BookingEntity> getBookings() {
         return bookings;
     }
 
     public void setBookings(List<BookingEntity> bookings) {
         this.bookings = bookings;
+    }
+
+    @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY,mappedBy = "meetingRoom")
+    public List<EquipmentEntity> getEquipment() {
+        return equipment;
+    }
+
+    public void setEquipment(List<EquipmentEntity> equipment) {
+        this.equipment = equipment;
     }
 }
