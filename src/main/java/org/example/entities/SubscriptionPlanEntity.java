@@ -1,6 +1,7 @@
 package org.example.entities;
 
 import jakarta.persistence.*;
+
 import java.util.List;
 
 @Entity
@@ -9,15 +10,7 @@ public class SubscriptionPlanEntity extends BaseEntity {
     private String name;
     private Double price;
     private List<ResidentEntity> residents;
-
-    public SubscriptionPlanEntity(String name, Double price, List<ResidentEntity> residents) {
-        this.name = name;
-        this.price = price;
-        this.residents = residents;
-    }
-
     public SubscriptionPlanEntity() {
-
     }
 
     @Column(name = "name")

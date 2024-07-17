@@ -1,6 +1,7 @@
 package org.example.entities;
 
 import jakarta.persistence.*;
+
 import java.util.List;
 
 @Entity
@@ -9,13 +10,7 @@ public class WorkplaceEntity extends BaseEntity {
     private String name;
     private List<BookingEntity> bookings;
 
-    public WorkplaceEntity(String name, List<BookingEntity> bookings) {
-        this.name = name;
-        this.bookings = bookings;
-    }
-
     public WorkplaceEntity() {
-
     }
 
     @Column(name = "name")
@@ -27,7 +22,7 @@ public class WorkplaceEntity extends BaseEntity {
         this.name = name;
     }
 
-    @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY,mappedBy = "workplace")
+    @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, mappedBy = "workplace")
     public List<BookingEntity> getBookings() {
         return bookings;
     }

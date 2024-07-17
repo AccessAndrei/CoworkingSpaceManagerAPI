@@ -7,11 +7,8 @@ import jakarta.persistence.*;
 public class EquipmentEntity extends BaseEntity {
     private String name;
     private MeetingRoomEntity meetingRoom;
-    public EquipmentEntity() {}
 
-    public EquipmentEntity(String name, MeetingRoomEntity meetingRoom) {
-        this.name = name;
-        this.meetingRoom = meetingRoom;
+    public EquipmentEntity() {
     }
 
 
