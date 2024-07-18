@@ -15,6 +15,7 @@ public interface BookingRepository extends GeneralRepository<BookingEntity, Inte
     @Query("SELECT b FROM BookingEntity b WHERE b.workplace.id = :workplaceId AND b.startTime < :end AND b.endTime > :start")
     List<BookingEntity> findBookingsByWorkplaceIdAndTimeRange(@Param("workplaceId") Integer workplaceId, @Param("start") LocalDateTime startTime, @Param("end") LocalDateTime endTime);
 
-    @Query("SELECT b FROM BookingEntity b WHERE b.resident.id = :residentId AND b.startTime BETWEEN :start AND :end")
-    List<BookingEntity> findBookingsByResidentIdAndTimeRange(@Param("residentId") Integer residentId, @Param("start") LocalDateTime startTime, @Param("end") LocalDateTime endTime);
+    @Query("SELECT b FROM BookingEntity b WHERE b.startTime < :end AND b.endTime > :start")
+    List<BookingEntity> findAllByBookingDateBetween(@Param("start") LocalDateTime startTime, @Param("end") LocalDateTime endTime);
+
 }

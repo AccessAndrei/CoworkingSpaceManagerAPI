@@ -17,7 +17,7 @@ public class ResidentController {
     }
 
     @PostMapping("/check-subscription")
-    public ResidentDTO checkAndUpdateSubscription(@RequestParam Integer residentId) {
-        return residentService.checkAndUpdateSubscription(residentId);
+    public ResidentDTO checkAndUpdateSubscription() {
+        return residentService.checkAndUpdateSubscription();
     }
 }

@@ -11,4 +11,5 @@ public interface GeneralRepository<T, ID> extends Repository<T, ID> {
 
     Optional<T> findById(ID id);
 
+    Iterable<T> findAll();
 }

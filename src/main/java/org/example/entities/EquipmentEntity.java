@@ -7,11 +7,8 @@ import jakarta.persistence.*;
 public class EquipmentEntity extends BaseEntity {
     private String name;
     private MeetingRoomEntity meetingRoom;
-
     public EquipmentEntity() {
     }
-
-
     @Column(name = "name")
     public String getName() {
         return name;

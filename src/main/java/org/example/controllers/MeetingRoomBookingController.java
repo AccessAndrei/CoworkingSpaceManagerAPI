@@ -13,19 +13,16 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/bookings")
 public class MeetingRoomBookingController {
-
     private final MeetingRoomBookingService meetingRoomBookingService;
-
     @Autowired
     public MeetingRoomBookingController(MeetingRoomBookingService meetingRoomBookingService) {
         this.meetingRoomBookingService = meetingRoomBookingService;
     }
-
     @PostMapping("/meeting-room")
     public BookingDTO bookMeetingRoom(@RequestParam Integer residentId,
-                                      @RequestParam Integer meetingRoomId,
                                       @RequestParam LocalDateTime startTime,
-                                      @RequestParam LocalDateTime endTime) {
-        return meetingRoomBookingService.bookMeetingRoom(residentId, meetingRoomId, startTime, endTime);
+                                      @RequestParam LocalDateTime endTime,
+                                      @RequestParam String equipmentName) {
+        return meetingRoomBookingService.bookMeetingRoom(residentId, startTime, endTime, equipmentName);
     }
 }

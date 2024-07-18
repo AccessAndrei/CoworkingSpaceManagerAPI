@@ -7,9 +7,11 @@ import org.example.dto.MeetingRoomDTO;
 import org.example.dto.ResidentDTO;
 import org.example.dto.SubscriptionPlanDTO;
 import org.example.entities.BookingEntity;
+import org.example.entities.EquipmentEntity;
 import org.example.entities.MeetingRoomEntity;
 import org.example.entities.ResidentEntity;
 import org.example.repositories.BookingRepository;
+import org.example.repositories.EquipmentRepository;
 import org.example.repositories.MeetingRoomRepository;
 import org.example.repositories.ResidentRepository;
 import org.example.services.MeetingRoomBookingService;
@@ -27,7 +29,9 @@ public class MeetingRoomBookingServiceImpl implements MeetingRoomBookingService 
     private final ResidentRepository residentRepository;
 
     @Autowired
-    public MeetingRoomBookingServiceImpl(MeetingRoomRepository meetingRoomRepository, BookingRepository bookingRepository, ResidentRepository residentRepository) {
+    public MeetingRoomBookingServiceImpl(MeetingRoomRepository meetingRoomRepository,
+                                         BookingRepository bookingRepository,
+                                         ResidentRepository residentRepository) {
         this.meetingRoomRepository = meetingRoomRepository;
         this.bookingRepository = bookingRepository;
         this.residentRepository = residentRepository;
@@ -35,22 +39,36 @@ public class MeetingRoomBookingServiceImpl implements MeetingRoomBookingService 
 
     @Override
     @Transactional
-    public BookingDTO bookMeetingRoom(Integer residentId, Integer meetingRoomId, LocalDateTime startTime, LocalDateTime endTime) {
-        List<BookingEntity> existingBookings = bookingRepository.findBookingsByMeetingRoomIdAndTimeRange(meetingRoomId, startTime, endTime);
-        if (!existingBookings.isEmpty()) {
-            throw new EntityNotFoundException("Meeting room is not available");
+    public BookingDTO bookMeetingRoom(Integer residentId, LocalDateTime startTime, LocalDateTime endTime, String equipmentName) {
+        ResidentEntity resident = residentRepository.findById(residentId)
+                .orElseThrow(() -> new EntityNotFoundException("Resident not found"));
+        List<MeetingRoomEntity> meetingRooms = (List<MeetingRoomEntity>) meetingRoomRepository.findAll();
+        MeetingRoomEntity availableRoom = null;
+
+        for (MeetingRoomEntity room : meetingRooms) {
+            List<EquipmentEntity> equipments = room.getEquipment();
+            for (EquipmentEntity equipment : equipments) {
+                if (equipment.getName().equalsIgnoreCase(equipmentName)) {
+                    List<BookingEntity> existingBookings = bookingRepository.findBookingsByMeetingRoomIdAndTimeRange(room.getId(), startTime, endTime);
+                    if (existingBookings.isEmpty()) {
+                        availableRoom = room;
+                        break;
+                    }
+                }
+            }
+            if (availableRoom != null) break;
         }
-        MeetingRoomEntity meetingRoomEntity = meetingRoomRepository.findById(meetingRoomId).orElseThrow(() -> new EntityNotFoundException("Meeting room not found"));
-        if (meetingRoomEntity == null) throw new EntityNotFoundException("Meeting room not found");
-        ResidentEntity resident = residentRepository.findById(residentId).orElseThrow(() -> new EntityNotFoundException("Resident not found"));
-        BookingEntity newBooking = new BookingEntity(startTime, endTime, resident, null, meetingRoomEntity);
+
+        if (availableRoom == null) {
+            throw new EntityNotFoundException("Подходящая комната для переговоров недоступна");
+        }
+        BookingEntity newBooking = new BookingEntity();
+        newBooking.setStartTime(startTime);
+        newBooking.setEndTime(endTime);
+        newBooking.setResident(resident);
+        newBooking.setMeetingRoom(availableRoom);
         bookingRepository.save(newBooking);
-        return new BookingDTO(
-                newBooking.getStartTime(),
-                newBooking.getEndTime(),
-                new ResidentDTO(resident.getId(), resident.getName(), resident.getEmail(), new SubscriptionPlanDTO(resident.getSubscriptionPlan().getId(), resident.getSubscriptionPlan().getName(), resident.getSubscriptionPlan().getPrice())),
-                null,
-                new MeetingRoomDTO(meetingRoomEntity.getId(), meetingRoomEntity.getName(), 4, true)
-        );
+        return new BookingDTO(newBooking.getStartTime(), newBooking.getEndTime(), new ResidentDTO(resident.getId(), resident.getName(), resident.getEmail(), new SubscriptionPlanDTO(resident.getSubscriptionPlan().getId(), resident.getSubscriptionPlan().getName(), resident.getSubscriptionPlan().getPrice())), null,
+                new MeetingRoomDTO(availableRoom.getId(), availableRoom.getName(), true));
     }
 }

@@ -15,10 +15,10 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 
-import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ResidentServiceImpl implements ResidentService {
@@ -34,26 +34,33 @@ public class ResidentServiceImpl implements ResidentService {
 
     @Override
     @Transactional
-    public ResidentDTO checkAndUpdateSubscription(int residentId) {
-        ResidentEntity resident = residentRepository.findById(residentId).orElseThrow(() -> new EntityNotFoundException("Workplace not found"));
-
+    public ResidentDTO checkAndUpdateSubscription() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime oneMonthAgo = now.minusMonths(1);
+        List<BookingEntity> bookingsLastMonth = bookingRepository.findAllByBookingDateBetween(oneMonthAgo, now);
+        Map<ResidentEntity, Long> residentBookingCounts = bookingsLastMonth.stream()
+                .collect(Collectors.groupingBy(BookingEntity::getResident, Collectors.counting()));
+        Map.Entry<ResidentEntity, Long> maxEntry = residentBookingCounts.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .orElseThrow(() -> new EntityNotFoundException("No bookings found for any resident in the last month"));
 
-        List<BookingEntity> bookingsLastMonth = bookingRepository.findBookingsByResidentIdAndTimeRange(residentId, oneMonthAgo, now);
-        System.out.println("Количество бронирований за последний месяц: " + bookingsLastMonth.size());
-        if (bookingsLastMonth.size() > 2) {
-            System.out.println("Резидент сделал более 10 бронирований за последний месяц.");
-            SubscriptionPlanEntity currentPlan = resident.getSubscriptionPlan();
+        ResidentEntity topResident = maxEntry.getKey();
+        long bookingCount = maxEntry.getValue();
+        System.out.println("Резидент с наибольшим количеством бронирований: " + topResident.getName() + " с " + bookingCount + " бронированиями.");
+        if (bookingCount > 1) {
+            SubscriptionPlanEntity currentPlan = topResident.getSubscriptionPlan();
             SubscriptionPlanEntity higherPlan = subscriptionPlanRepository.findNextHigherPlan(currentPlan.getId());
 
             if (higherPlan != null) {
-                resident.setSubscriptionPlan(higherPlan);
-                residentRepository.save(resident);
+                topResident.setSubscriptionPlan(higherPlan);
+                residentRepository.save(topResident);
                 System.out.println("Резиденту предложен новый план: " + higherPlan.getName() + " за те же деньги.");
             }
-
         }
-        return new ResidentDTO(resident.getId(), resident.getName(), resident.getEmail(), new SubscriptionPlanDTO(resident.getSubscriptionPlan().getId(), resident.getSubscriptionPlan().getName(), resident.getSubscriptionPlan().getPrice()));
+
+        return new ResidentDTO(topResident.getId(), topResident.getName(), topResident.getEmail(),
+                new SubscriptionPlanDTO(topResident.getSubscriptionPlan().getId(),
+                        topResident.getSubscriptionPlan().getName(),
+                        topResident.getSubscriptionPlan().getPrice()));
     }
 }

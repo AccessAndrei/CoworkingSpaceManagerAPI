@@ -5,5 +5,5 @@ import org.example.dto.MeetingRoomDTO;
 import java.time.LocalDateTime;
 
 public interface MeetingRoomBookingService {
-    BookingDTO bookMeetingRoom(Integer residentId, Integer meetingRoomId, LocalDateTime startTime, LocalDateTime endTime);
+    BookingDTO bookMeetingRoom(Integer residentId, LocalDateTime startTime, LocalDateTime endTime, String equipmentName);
 }

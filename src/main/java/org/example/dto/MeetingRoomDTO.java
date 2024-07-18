@@ -7,10 +7,9 @@ public class MeetingRoomDTO {
     private boolean isAvailable;
 
 
-    public MeetingRoomDTO(Integer id, String name, int capacity, boolean isAvailable) {
+    public MeetingRoomDTO(Integer id, String name, boolean isAvailable) {
         this.id = id;
         this.name = name;
-        this.capacity = capacity;
         this.isAvailable = isAvailable;
     }
 

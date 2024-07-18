@@ -9,10 +9,8 @@ import java.util.List;
 public class WorkplaceEntity extends BaseEntity {
     private String name;
     private List<BookingEntity> bookings;
-
     public WorkplaceEntity() {
     }
-
     @Column(name = "name")
     public String getName() {
         return name;

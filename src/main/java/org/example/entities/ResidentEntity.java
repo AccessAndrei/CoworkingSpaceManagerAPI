@@ -10,7 +10,6 @@ public class ResidentEntity extends BaseEntity {
     private String email;
     private List<BookingEntity> bookings;
     private SubscriptionPlanEntity subscriptionPlan;
-
     public ResidentEntity() {}
 
     public ResidentEntity(String name, String email, SubscriptionPlanEntity subscriptionPlan) {
